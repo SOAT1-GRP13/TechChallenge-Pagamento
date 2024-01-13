@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "pagamento-api",
-      "image": "christiandmelo/tech-challenge-soat1-grp13-pagamento:latest",
+      "image": "christiandmelo/tech-challenge-soat1-grp13-pagamento:V1.0.14",
       "cpu": 0,
       "portMappings": [
         {
