@@ -8,19 +8,13 @@ namespace Domain.Configuration
             AccesToken = string.Empty;
             Notification_url = string.Empty;
             External_Pos_Id = string.Empty;
-            ClientSecret = string.Empty;
-            PreSalt = string.Empty;
-            PosSalt = string.Empty;
-            ConnectionString = string.Empty;
+            Producao_url = string.Empty;
         }
 
         public string MercadoPagoUserId { get; set; }
         public string AccesToken { get; set; }
         public string Notification_url { get; set; }
         public string External_Pos_Id { get; set; }
-        public string ClientSecret { get; set; }
-        public string PreSalt { get; set; }
-        public string PosSalt { get; set; }
-        public string ConnectionString { get; set; }
+        public string Producao_url { get; set; }
     }
 }

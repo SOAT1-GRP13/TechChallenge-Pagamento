@@ -1,8 +1,5 @@
-
-using Application.Pagamentos.MercadoPago.Boundaries;
 using Application.Pagamentos.MercadoPago.UseCases;
 using Domain.MercadoPago;
-using Domain.Pedidos;
 
 namespace Application.Pagamentos.MercadoPago.Gateways
 {
@@ -13,6 +10,11 @@ namespace Application.Pagamentos.MercadoPago.Gateways
         public MercadoPagoUseCase(IMercadoPagoRepository mercadoPagoRepository)
         {
             _mercadoPagoRepository = mercadoPagoRepository;
+        }
+
+        public async Task<string> GerarQRCode(MercadoPagoOrder order)
+        {
+            return await _mercadoPagoRepository.GeraPedidoQrCode(order);
         }
 
         public async Task<MercadoPagoOrderStatus> PegaStatusPedido(long id)
