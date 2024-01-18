@@ -49,7 +49,7 @@ namespace Application.Tests.Pagamentos.AutoMapper
                 Quantity = 0,
                 Unit_measure = "",
                 Total_amount = 0
-        };
+            };
 
             // Act
             var orderItem = _mapper.Map<OrderItem>(orderItemInput);
