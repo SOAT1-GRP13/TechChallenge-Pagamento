@@ -16,16 +16,11 @@ namespace Infra.MercadoPago.Repository
             _settings = options.Value;
         }
 
-        public async Task<string> GeraPedidoQrCode(Pedido pedido)
+        public async Task<string> GeraPedidoQrCode(MercadoPagoOrder orderDto)
         {
-            var itensList = new List<OrderItem>();
 
-            foreach (var orderItem in pedido.PedidoItems.ToList())
-            {
-                itensList.Add(new OrderItem(orderItem));
-            }
+            orderDto.Notification_url = _settings.Notification_url;
 
-            var dto = new MercadoPagoOrder(pedido, itensList, _settings.Notification_url);
 
             var client = new HttpClient();
             var request = new HttpRequestMessage(HttpMethod.Post, $"https://api.mercadopago.com/instore/orders/qr/seller/collectors/{_settings.MercadoPagoUserId}/pos/{_settings.External_Pos_Id}/qrs");
@@ -37,7 +32,7 @@ namespace Infra.MercadoPago.Repository
                 WriteIndented = true
             };
 
-            var order = JsonSerializer.Serialize(dto, serializeOptions);
+            var order = JsonSerializer.Serialize(orderDto, serializeOptions);
             var content = new StringContent(order, Encoding.UTF8, "application/json");
             request.Content = content;
             var response = await client.SendAsync(request);

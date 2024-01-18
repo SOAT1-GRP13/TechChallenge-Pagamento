@@ -1,10 +1,8 @@
-using Domain.Pedidos;
-
 namespace Domain.MercadoPago
 {
     public interface IMercadoPagoRepository
     {
-        Task<string> GeraPedidoQrCode(Pedido pedido);
+        Task<string> GeraPedidoQrCode(MercadoPagoOrder order);
 
         Task<MercadoPagoOrderStatus> PegaStatusPedido(long id);
     }

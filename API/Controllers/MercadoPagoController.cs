@@ -1,4 +1,5 @@
-﻿using Application.Pagamentos.MercadoPago.Commands;
+﻿using Application.Pagamentos.MercadoPago.Boundaries;
+using Application.Pagamentos.MercadoPago.Commands;
 using Domain.Base.Communication.Mediator;
 using Domain.Base.Messages.CommonMessages.Notifications;
 using MediatR;
@@ -44,6 +45,28 @@ namespace API.Controllers
             }
         }
 
+        [SwaggerOperation(
+            Summary = "Gerar QR Code do mercado pago",
+            Description = "Endpoint responsavel por gerar QR Code do mercado pago")]
+        [SwaggerResponse(200, "Retorna o qr_data", typeof(GerarQROutput))]
+        [SwaggerResponse(400, "Caso não seja preenchido todos os campos obrigatórios")]
+        [SwaggerResponse(500, "Caso algo inesperado aconteça")]
+        [HttpPost]
+        [Route("GerarQR")]
+        public async Task<IActionResult> QRMercadoPago([FromBody]OrderInput input)
+        {
+            var command = new GerarQRCommand(input);
+            var response = await _mediatorHandler.EnviarComando<GerarQRCommand, GerarQROutput>(command);
+
+            if (OperacaoValida())
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, ObterMensagensErro());
+            }
+        }
 
     }
 }
