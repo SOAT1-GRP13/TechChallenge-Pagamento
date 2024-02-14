@@ -18,7 +18,7 @@ namespace Infra.Pagamento.PedidosQR.Repository
                 {
                     ServiceURL = options.ServiceUrl
                 };
-                AmazonDynamoDBClient dynamoClient = new AmazonDynamoDBClient(clientConfig);
+                AmazonDynamoDBClient dynamoClient = new AmazonDynamoDBClient("Aksdjaksdhueiadqwert", "dshdajksdhajskdhasjkdhasjkdashkjqwertyu", clientConfig);
                 _dynamoDBContext = new DynamoDBContext(dynamoClient);
             }
             else
