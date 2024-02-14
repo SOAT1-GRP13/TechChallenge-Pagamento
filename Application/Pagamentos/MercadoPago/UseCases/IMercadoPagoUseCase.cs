@@ -9,5 +9,6 @@ namespace Application.Pagamentos.MercadoPago.UseCases
         Task<MercadoPagoOrderStatus> PegaStatusPedido(long id);
         Task<string> GerarQRCode(MercadoPagoOrder order);
         Task SalvaPedidoQR(QrCodeDTO dto);
+        Task<QrCodeDTO> BuscaPedidoQr(string pedidoId);
     }
 }

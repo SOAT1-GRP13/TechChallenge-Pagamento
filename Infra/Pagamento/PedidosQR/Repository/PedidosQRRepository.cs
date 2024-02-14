@@ -10,9 +10,10 @@ namespace Infra.Pagamento.PedidosQR.Repository
     {
         private readonly IDynamoDBContext _dynamoDBContext;
 
-        public PedidosQRRepository(IAmazonDynamoDB client, IHostEnvironment hostingEnv, DynamoLocalOptions options)
+        public PedidosQRRepository(IAmazonDynamoDB client, DynamoLocalOptions options)
         {
-            if (hostingEnv.IsDevelopment())
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (!string.IsNullOrEmpty(env) && env == "Development")
             {
                 AmazonDynamoDBConfig clientConfig = new AmazonDynamoDBConfig
                 {
@@ -28,17 +29,20 @@ namespace Infra.Pagamento.PedidosQR.Repository
         }
         public async Task SalvaPedidoQR(QrCodeDTO dto)
         {
-            try
-            {
-                var pedidoQR = new PedidoQR(dto.PedidoId, dto.QRData);
+            var pedidoQR = new PedidoQR(dto.PedidoId, dto.QRData);
 
-                await _dynamoDBContext.SaveAsync(pedidoQR);
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
+            await _dynamoDBContext.SaveAsync(pedidoQR);
 
+        }
+
+        public async Task<QrCodeDTO> BuscaPedidoQr(string pedidoId)
+        {
+            var pedidoQR = await _dynamoDBContext.LoadAsync<PedidoQR>(pedidoId);
+
+            if (pedidoQR != null)
+                return new QrCodeDTO(pedidoQR.QrData, pedidoId);
+
+            return new QrCodeDTO();
         }
     }
 }

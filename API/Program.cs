@@ -7,7 +7,7 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Domain.RabbitMQ;
 using Infra.RabbitMQ.Consumers;
-using Infra.Pagamento.PedidosQR;
+using Domain.PedidosQR;
 
 var builder = WebApplication.CreateBuilder(args);
 

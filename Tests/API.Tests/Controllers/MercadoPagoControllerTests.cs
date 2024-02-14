@@ -7,6 +7,7 @@ using Application.Pagamentos.MercadoPago.Commands;
 using Domain.Base.Messages.CommonMessages.Notifications;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Pagamentos.MercadoPago.Boundaries;
+using Microsoft.Extensions.Hosting;
 
 namespace API.Tests.Controllers
 {
@@ -60,7 +61,7 @@ namespace API.Tests.Controllers
             );
 
             // Act
-            var result = await mercadoPagoController.WebHookMercadoPago(0, null);
+            var result = await mercadoPagoController.WebHookMercadoPago(0, "");
 
             // Assert
             var badRequestResult = Assert.IsType<ObjectResult>(result);
@@ -71,66 +72,77 @@ namespace API.Tests.Controllers
             Assert.Contains("Topic é obrigatório", mensagensErro);
         }
 
-        // [Fact]
-        // public async Task QRMercadoPago_DeveRetornarOk_QuandoComandoExecutadoComSucesso()
-        // {
-        //     // Arrange
-        //     var mediatorHandlerMock = new Mock<IMediatorHandler>();
-        //     var domainNotificationHandler = new DomainNotificationHandler();
-        //     var mercadoPagoController = new MercadoPagoController(domainNotificationHandler, mediatorHandlerMock.Object);
+        [Fact]
+        public async Task FakeWebhook_DeveRetornarOk_QuandoComandoExecutadoComSucesso()
+        {
+            // Arrange
+            var mediatorHandlerMock = new Mock<IMediatorHandler>();
+            var domainNotificationHandler = new DomainNotificationHandler();
+            var mercadoPagoController = new MercadoPagoController(domainNotificationHandler, mediatorHandlerMock.Object);
 
-        //     var orderInput = new OrderInput { };
-        //     //var gerarQROutput = new GerarQROutput("qr_data_sample");
+            mediatorHandlerMock.Setup(m => m.EnviarComando<StatusPagamentoFakeCommand, bool>(It.IsAny<StatusPagamentoFakeCommand>()))
+                               .ReturnsAsync(true);
 
-        //     mediatorHandlerMock.Setup(m => m.EnviarComando<GerarQRCommand, bool>(It.IsAny<GerarQRCommand>()))
-        //                        .ReturnsAsync(true);
+            // Act
+            var result = await mercadoPagoController.FakeWebhook(Guid.NewGuid(), "sucesso");
 
-        //     // Act
-        //     var result = await mercadoPagoController.QRMercadoPago(orderInput);
+            // Assert
+            Assert.IsType<OkResult>(result);
+        }
 
-        //     // Assert
-        //     Assert.IsType<OkObjectResult>(result);
-        //     // var okResult = result as OkObjectResult;
-        //     // Assert.Equal(gerarQROutput, okResult?.Value);
-        // }
 
-        // [Fact]
-        // public async Task QRMercadoPago_DeveRetornarBadRequest_QuandoComandoFalhaNaValidacao()
-        // {
-        //     // Arrange
-        //     var mediatorHandlerMock = new Mock<IMediatorHandler>();
-        //     var domainNotificationHandler = new DomainNotificationHandler();
-        //     var mercadoPagoController = new MercadoPagoController(domainNotificationHandler, mediatorHandlerMock.Object);
+        [Fact]
+        public async Task BuscaQR_DeveRetornarOk_QuandoComandoExecutadoComSucesso()
+        {
+            // Arrange
+            var mediatorHandlerMock = new Mock<IMediatorHandler>();
+            var domainNotificationHandler = new DomainNotificationHandler();
+            var mercadoPagoController = new MercadoPagoController(domainNotificationHandler, mediatorHandlerMock.Object);
 
-        //     var orderInput = new OrderInput(); // Dados inválidos para falhar na validação
+            var guidResult = Guid.NewGuid();
+            var gerarQrResult = new GerarQROutput("sucesso", guidResult.ToString());
 
-        //     mediatorHandlerMock.Setup(m => m.EnviarComando<GerarQRCommand, bool>(It.IsAny<GerarQRCommand>()))
-        //         .Callback<GerarQRCommand>(cmd =>
-        //         {
-        //             if (!cmd.EhValido())
-        //             {
-        //                 foreach (var error in cmd.ValidationResult.Errors)
-        //                 {
-        //                     domainNotificationHandler.Handle(new DomainNotification(error.PropertyName, error.ErrorMessage), CancellationToken.None);
-        //                 }
-        //             }
-        //         })
-        //         .ReturnsAsync(true);
+            mediatorHandlerMock.Setup(m => m.EnviarComando<BuscarQRCommand, GerarQROutput>(It.IsAny<BuscarQRCommand>()))
+                               .ReturnsAsync(gerarQrResult);
 
-        //     // Act
-        //     var result = await mercadoPagoController.QRMercadoPago(orderInput);
+            // Act
+            var result = await mercadoPagoController.BuscaQR(guidResult);
 
-        //     // Assert
-        //     var badRequestResult = Assert.IsType<ObjectResult>(result);
-        //     var mensagensErro = Assert.IsType<List<string>>(badRequestResult.Value);
-        //     Assert.Equal(400, badRequestResult.StatusCode);
-        //     Assert.Contains("Titulo é obrigatório", mensagensErro);
-        //     Assert.Contains("Id do pedido é obrigatório", mensagensErro);
-        //     Assert.Contains("Expiration Date é obrigatório", mensagensErro);
-        //     Assert.Contains("Description é obrigatório", mensagensErro);
-        //     Assert.Contains("'Total_amount' must not be empty.", mensagensErro);
-        //     Assert.Contains("Total amount é obrigatório", mensagensErro);
-        //     Assert.Contains("Ao menos 1 item é necessario", mensagensErro);
-        // }
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
+            var okResult = result as OkObjectResult;
+            Assert.Equal(gerarQrResult, okResult?.Value);
+        }
+
+        [Fact]
+        public async Task BuscaQR_DeveRetornarBadRequest_QuandoComandoFalhaNaValidacao()
+        {
+            // Arrange
+            var mediatorHandlerMock = new Mock<IMediatorHandler>();
+            var domainNotificationHandler = new DomainNotificationHandler();
+            var mercadoPagoController = new MercadoPagoController(domainNotificationHandler, mediatorHandlerMock.Object);
+
+            mediatorHandlerMock.Setup(m => m.EnviarComando<BuscarQRCommand, GerarQROutput>(It.IsAny<BuscarQRCommand>()))
+                .Callback<BuscarQRCommand>(cmd =>
+                {
+                    if (!cmd.EhValido())
+                    {
+                        foreach (var error in cmd.ValidationResult.Errors)
+                        {
+                            domainNotificationHandler.Handle(new DomainNotification(error.PropertyName, error.ErrorMessage), CancellationToken.None);
+                        }
+                    }
+                })
+                .ReturnsAsync(new GerarQROutput());
+
+            // Act
+            var result = await mercadoPagoController.BuscaQR(Guid.Empty);
+
+            // Assert
+            var badRequestResult = Assert.IsType<ObjectResult>(result);
+            var mensagensErro = Assert.IsType<List<string>>(badRequestResult.Value);
+            Assert.Equal(400, badRequestResult.StatusCode);
+            Assert.Contains("PedidoId é obrigatório", mensagensErro);
+        }
     }
 }

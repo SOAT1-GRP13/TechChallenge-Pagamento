@@ -1,4 +1,4 @@
-namespace Infra.Pagamento.PedidosQR
+namespace Domain.PedidosQR
 {
     public class DynamoLocalOptions 
     {

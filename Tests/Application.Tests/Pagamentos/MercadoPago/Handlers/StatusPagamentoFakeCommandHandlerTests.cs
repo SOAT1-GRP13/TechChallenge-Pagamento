@@ -10,22 +10,19 @@ using Moq;
 
 namespace Application.Tests.Pagamentos.MercadoPago.Handlers
 {
-    public class StatusPagamentoCommandHandlerTests
+    public class StatusPagamentoFakeCommandHandlerTests
     {
-        private readonly Mock<IMercadoPagoUseCase> _mercadoPagoUseCaseMock;
         private readonly Mock<IMediatorHandler> _mediatorHandlerMock;
         private readonly Mock<IRabbitMQService> _rabbitMQServiceMock;
         private readonly RabbitMQOptions _rabbitMQOptions;
-        private readonly StatusPagamentoCommandHandler _handler;
-        public StatusPagamentoCommandHandlerTests()
+        private readonly StatusPagamentoFakeCommandHandler _handler;
+        public StatusPagamentoFakeCommandHandlerTests()
         {
             _rabbitMQOptions = new RabbitMQOptions();
             _rabbitMQServiceMock = new Mock<IRabbitMQService>();
             _mediatorHandlerMock = new Mock<IMediatorHandler>();
-            _mercadoPagoUseCaseMock = new Mock<IMercadoPagoUseCase>();
-            _handler = new StatusPagamentoCommandHandler(
+            _handler = new StatusPagamentoFakeCommandHandler(
                 _mediatorHandlerMock.Object,
-                _mercadoPagoUseCaseMock.Object,
             _rabbitMQServiceMock.Object,
              _rabbitMQOptions);
         }
@@ -34,7 +31,7 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
         public async Task Handle_DeveRetornarFalse_QuandoValidacaoFalha()
         {
             // Arrange
-            var command = new StatusPagamentoCommand(0, ""); // Dados inválidos para falhar na validação
+            var command = new StatusPagamentoFakeCommand(Guid.Empty, ""); // Dados inválidos para falhar na validação
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
@@ -47,9 +44,8 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
         public async Task Handle_DeveRetornarTrue_QuandoComandoExecutadoComSucesso()
         {
             // Arrange
-            var command = new StatusPagamentoCommand(123, "payment");
+            var command = new StatusPagamentoFakeCommand(Guid.NewGuid(), "payment");
             var mercadoPagoOrderStatus = new MercadoPagoOrderStatus { Status = "closed", External_reference = Guid.NewGuid().ToString() };
-            _mercadoPagoUseCaseMock.Setup(m => m.PegaStatusPedido(It.IsAny<long>())).ReturnsAsync(mercadoPagoOrderStatus);
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
@@ -58,22 +54,5 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
             Assert.True(result);
             _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(It.IsAny<string>(), It.IsAny<string>()), Times.Once());
         }
-
-        [Fact]
-        public async Task Handle_DevePublicarNotificacao_QuandoExcecaoDeDominioOcorrer()
-        {
-            // Arrange
-            var command = new StatusPagamentoCommand(123, "payment");
-
-            _mercadoPagoUseCaseMock.Setup(m => m.PegaStatusPedido(It.IsAny<long>())).ThrowsAsync(new DomainException("Erro de domínio"));
-
-            // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
-
-            // Assert
-            Assert.False(result);
-            _mediatorHandlerMock.Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Once);
-        }
-
     }
 }

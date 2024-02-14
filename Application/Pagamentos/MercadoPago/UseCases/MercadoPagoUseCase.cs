@@ -30,6 +30,11 @@ namespace Application.Pagamentos.MercadoPago.Gateways
         {
             await _pedidoQrRepository.SalvaPedidoQR(dto);
         }
+
+        public async Task<QrCodeDTO> BuscaPedidoQr(string pedidoId)
+        {
+            return await _pedidoQrRepository.BuscaPedidoQr(pedidoId);
+        }
     }
 
 }

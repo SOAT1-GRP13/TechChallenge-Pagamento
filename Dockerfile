@@ -2,12 +2,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /app
 
-
-#install debugger for NET Core
-RUN apt-get update
-RUN apt-get install -y unzip
-RUN curl -sSL https://aka.ms/getvsdbgsh | /bin/sh /dev/stdin -v latest -l ~/vsdbg
-
 # Copiando os arquivos de projeto e restaurando as dependências
 COPY ./*.sln ./
 COPY ./API/*.csproj ./API/

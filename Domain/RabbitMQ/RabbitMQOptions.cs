@@ -1,4 +1,4 @@
-﻿namespace Infra.RabbitMQ
+﻿namespace Domain.RabbitMQ
 {
     public class RabbitMQOptions
     {

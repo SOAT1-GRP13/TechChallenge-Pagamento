@@ -6,8 +6,8 @@ using RabbitMQ.Client.Events;
 using Microsoft.Extensions.Hosting;
 using Domain.Base.Communication.Mediator;
 using Microsoft.Extensions.DependencyInjection;
-using Application.Pagamentos.MercadoPago.Boundaries;
 using Application.Pagamentos.MercadoPago.Commands;
+using Domain.RabbitMQ;
 
 namespace Infra.RabbitMQ.Consumers
 {
@@ -60,7 +60,7 @@ namespace Infra.RabbitMQ.Consumers
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("Erro deserializar OrderInput", ex);
+                    throw new Exception("Erro deserializar Pedido", ex);
                 }
 ;
                 var command = new GerarQRCommand(pedido);
