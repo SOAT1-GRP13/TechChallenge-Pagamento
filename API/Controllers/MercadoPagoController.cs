@@ -2,6 +2,7 @@
 using Application.Pagamentos.MercadoPago.Commands;
 using Domain.Base.Communication.Mediator;
 using Domain.Base.Messages.CommonMessages.Notifications;
+using Domain.Pedidos;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -53,10 +54,10 @@ namespace API.Controllers
         [SwaggerResponse(500, "Caso algo inesperado aconteça")]
         [HttpPost]
         [Route("GerarQR")]
-        public async Task<IActionResult> QRMercadoPago([FromBody]OrderInput input)
+        public async Task<IActionResult> QRMercadoPago([FromBody]Pedido input)
         {
             var command = new GerarQRCommand(input);
-            var response = await _mediatorHandler.EnviarComando<GerarQRCommand, GerarQROutput>(command);
+            var response = await _mediatorHandler.EnviarComando<GerarQRCommand, bool>(command);
 
             if (OperacaoValida())
             {

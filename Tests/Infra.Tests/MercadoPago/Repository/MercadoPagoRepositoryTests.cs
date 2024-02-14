@@ -1,7 +1,7 @@
 ﻿using Domain.Configuration;
 using Domain.MercadoPago;
 using Domain.Pedidos;
-using Infra.MercadoPago.Repository;
+using Infra.Pagamento.MercadoPago.Repository;
 using Microsoft.Extensions.Options;
 using Moq;
 
@@ -24,13 +24,10 @@ namespace Infra.Tests.MercadoPago.Repository
             };
             mockOptions.Setup(opt => opt.Value).Returns(secrets);
 
-            var pedido = new Pedido(Guid.NewGuid(), false, 0, 10);
-            var pedidoItem = new PedidoItem(Guid.NewGuid(), "Produto 1", 1, 10);
-            var itens = new List<OrderItem>
-            {
-                new OrderItem(pedidoItem)
-            };
-            var order = new MercadoPagoOrder(pedido, itens, "Teste");
+            var pedido = new Pedido();
+
+            var order = new MercadoPagoOrder(pedido);
+            order.Notification_url = "teste";
 
             var repository = new MercadoPagoRepository(mockOptions.Object);
 

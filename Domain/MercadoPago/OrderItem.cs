@@ -16,7 +16,7 @@ namespace Domain.MercadoPago
 
         public OrderItem(PedidoItem item)
         {
-            Title = item.ProdutoNome;
+            Title = item.ProdutoNome!;
             Description = "Observação do item"; //TODO implementar isto no pedidoItem
             Unit_price = item.ValorUnitario;
             Quantity = item.Quantidade;

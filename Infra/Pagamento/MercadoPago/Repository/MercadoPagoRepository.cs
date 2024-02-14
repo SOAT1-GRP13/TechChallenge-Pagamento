@@ -2,10 +2,9 @@ using System.Text;
 using System.Text.Json;
 using Domain.Configuration;
 using Domain.MercadoPago;
-using Domain.Pedidos;
 using Microsoft.Extensions.Options;
 
-namespace Infra.MercadoPago.Repository
+namespace Infra.Pagamento.MercadoPago.Repository
 {
     public class MercadoPagoRepository : IMercadoPagoRepository
     {

@@ -1,16 +1,17 @@
 using Application.Pagamentos.MercadoPago.Boundaries;
 using Domain.Base.Messages;
+using Domain.Pedidos;
 
 namespace Application.Pagamentos.MercadoPago.Commands
 {
-    public class GerarQRCommand : Command<GerarQROutput>
+    public class GerarQRCommand : Command<bool>
     {
-        public GerarQRCommand(OrderInput input)
+        public GerarQRCommand(Pedido input)
         {
             Input = input;
         }
 
-        public OrderInput Input {get;set;}
+        public Pedido Input {get;set;}
 
         public override bool EhValido()
         {

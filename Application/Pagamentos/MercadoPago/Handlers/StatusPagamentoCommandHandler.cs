@@ -1,11 +1,8 @@
 using Application.Pagamentos.MercadoPago.Commands;
 using Application.Pagamentos.MercadoPago.UseCases;
-using Application.Pedidos.UseCases;
 using Domain.Base.Communication.Mediator;
 using Domain.Base.DomainObjects;
 using Domain.Base.Messages.CommonMessages.Notifications;
-using Domain.MercadoPago;
-using Domain.Pedidos;
 using MediatR;
 
 namespace Application.Pagamentos.MercadoPago.Handlers
@@ -14,14 +11,12 @@ namespace Application.Pagamentos.MercadoPago.Handlers
         IRequestHandler<StatusPagamentoCommand, bool>
     {
 
-        private readonly IPedidoUseCase _pedidoUseCase;
         private readonly IMercadoPagoUseCase _mercadoPagoUseCase;
         private readonly IMediatorHandler _mediatorHandler;
 
-        public StatusPagamentoCommandHandler(IPedidoUseCase pedidoUseCase,
+        public StatusPagamentoCommandHandler(
          IMediatorHandler mediatorHandler, IMercadoPagoUseCase mercadoPagoUseCase)
         {
-            _pedidoUseCase = pedidoUseCase;
             _mediatorHandler = mediatorHandler;
             _mercadoPagoUseCase = mercadoPagoUseCase;
         }
@@ -32,16 +27,17 @@ namespace Application.Pagamentos.MercadoPago.Handlers
             {
                 try
                 {
-                    var pedidoStatus = await _mercadoPagoUseCase.PegaStatusPedido(request.Id);
+                    //TODO publicar na fila
+                    // var pedidoStatus = await _mercadoPagoUseCase.PegaStatusPedido(request.Id);
 
-                    if (pedidoStatus.Status == "closed")
-                    {
-                        await _pedidoUseCase.TrocaStatusPedido(Guid.Parse(pedidoStatus.External_reference), PedidoStatus.Pago);
-                    }
-                    else if (pedidoStatus.Status == "expired")
-                    {
-                        await _pedidoUseCase.TrocaStatusPedido(Guid.Parse(pedidoStatus.External_reference), PedidoStatus.Cancelado);
-                    }
+                    // if (pedidoStatus.Status == "closed")
+                    // {
+                    //     await _pedidoUseCase.TrocaStatusPedido(Guid.Parse(pedidoStatus.External_reference), PedidoStatus.Pago);
+                    // }
+                    // else if (pedidoStatus.Status == "expired")
+                    // {
+                    //     await _pedidoUseCase.TrocaStatusPedido(Guid.Parse(pedidoStatus.External_reference), PedidoStatus.Cancelado);
+                    // }
 
                     return true;
                 }
