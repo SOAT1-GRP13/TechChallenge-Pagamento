@@ -32,10 +32,18 @@ namespace Application.Pagamentos.MercadoPago.Handlers
                 var pedidoId = request.Id.ToString();
 
 
-                var pedido = new PedidoPago(pedidoId);
+                var pedido = new PedidoStatus(pedidoId);
 
                 string mensagem = JsonSerializer.Serialize(pedido);
-                _rabbitMQService.PublicaMensagem(_options.QueuePedidoPago, mensagem);
+
+                if (request.Status == "closed")
+                {
+                    _rabbitMQService.PublicaMensagem(_options.QueuePedidoPago, mensagem);
+                }
+                else
+                {
+                    _rabbitMQService.PublicaMensagem(_options.QueuePedidoRecusado, mensagem);
+                }
 
                 return true;
             }

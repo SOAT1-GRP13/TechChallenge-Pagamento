@@ -48,15 +48,15 @@ namespace API.Controllers
 
         [SwaggerOperation(
             Summary = "Webhook fake mercado Pago",
-            Description = "Endpoint responsavel por receber um evento simulando o mercado pago")]
+            Description = "Endpoint responsavel por receber um evento simulando o mercado pago, para considerar como pago o status deve ser igual a closed, caso contraria será pedido recusado")]
         [SwaggerResponse(200, "Retorna OK após alterar o status")]
         [SwaggerResponse(400, "Caso não seja preenchido todos os campos obrigatórios")]
         [SwaggerResponse(500, "Caso algo inesperado aconteça")]
         [HttpPost]
         [Route("FakeWebhook")]
-        public async Task<IActionResult> FakeWebhook([FromQuery] Guid id, [FromQuery] string topic)
+        public async Task<IActionResult> FakeWebhook([FromQuery] Guid id, [FromQuery] string topic, [FromQuery] string status)
         {
-            var command = new StatusPagamentoFakeCommand(id, topic);
+            var command = new StatusPagamentoFakeCommand(id, topic, status);
             await _mediatorHandler.EnviarComando<StatusPagamentoFakeCommand, bool>(command);
 
             if (OperacaoValida())

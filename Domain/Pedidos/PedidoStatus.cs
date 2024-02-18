@@ -1,8 +1,8 @@
 namespace Domain.Pedidos
 {
-    public class PedidoPago
+    public class PedidoStatus
     {
-        public PedidoPago(string pedidoId)
+        public PedidoStatus(string pedidoId)
         {
             PedidoId = Guid.Parse(pedidoId);
         }

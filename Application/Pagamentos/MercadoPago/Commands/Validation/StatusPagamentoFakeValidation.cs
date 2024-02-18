@@ -13,6 +13,10 @@ public class StatusPagamentoFakeValidation : AbstractValidator<StatusPagamentoFa
         RuleFor(x => x.Topic)
         .NotEmpty()
         .WithMessage("Topic é obrigatório");
+
+        RuleFor(x => x.Status)
+        .NotEmpty()
+        .WithMessage("Status é obrigatório");
     }
 
 }

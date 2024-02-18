@@ -35,15 +35,17 @@ namespace Application.Pagamentos.MercadoPago.Handlers
             {
                 try
                 {
-                    //TODO publicar na fila
                     var pedidoStatus = await _mercadoPagoUseCase.PegaStatusPedido(request.Id);
+                    var pedido = new PedidoStatus(pedidoStatus.External_reference);
+                    string mensagem = JsonSerializer.Serialize(pedido);
 
                     if (pedidoStatus.Status == "closed")
                     {
-                        var pedido = new PedidoPago(pedidoStatus.External_reference);
-
-                        string mensagem = JsonSerializer.Serialize(pedido);
                         _rabbitMQService.PublicaMensagem(_options.QueuePedidoPago, mensagem);
+                    }
+                    else if (pedidoStatus.Status == "expired")
+                    {
+                        _rabbitMQService.PublicaMensagem(_options.QueuePedidoRecusado, mensagem);
                     }
 
                     return true;

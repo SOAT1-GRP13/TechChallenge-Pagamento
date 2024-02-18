@@ -84,7 +84,7 @@ namespace API.Tests.Controllers
                                .ReturnsAsync(true);
 
             // Act
-            var result = await mercadoPagoController.FakeWebhook(Guid.NewGuid(), "sucesso");
+            var result = await mercadoPagoController.FakeWebhook(Guid.NewGuid(), "sucesso", "closed");
 
             // Assert
             Assert.IsType<OkResult>(result);

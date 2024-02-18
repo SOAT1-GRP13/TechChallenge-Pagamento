@@ -31,7 +31,7 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
         public async Task Handle_DeveRetornarFalse_QuandoValidacaoFalha()
         {
             // Arrange
-            var command = new StatusPagamentoFakeCommand(Guid.Empty, ""); // Dados inválidos para falhar na validação
+            var command = new StatusPagamentoFakeCommand(Guid.Empty, "", ""); // Dados inválidos para falhar na validação
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
@@ -44,7 +44,7 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
         public async Task Handle_DeveRetornarTrue_QuandoComandoExecutadoComSucesso()
         {
             // Arrange
-            var command = new StatusPagamentoFakeCommand(Guid.NewGuid(), "payment");
+            var command = new StatusPagamentoFakeCommand(Guid.NewGuid(), "payment", "closed");
             var mercadoPagoOrderStatus = new MercadoPagoOrderStatus { Status = "closed", External_reference = Guid.NewGuid().ToString() };
 
             // Act
