@@ -4,8 +4,6 @@ using Application.Pagamentos.MercadoPago.UseCases;
 using Domain.Base.Communication.Mediator;
 using Domain.Base.DomainObjects;
 using Domain.Base.Messages.CommonMessages.Notifications;
-using Domain.MercadoPago;
-using Domain.PedidosQR;
 using MediatR;
 
 namespace Application.Pagamentos.MercadoPago.Handlers
@@ -27,16 +25,9 @@ namespace Application.Pagamentos.MercadoPago.Handlers
         {
             if (request.EhValido())
             {
-                try
-                {
-                    var pedidoQr = await _mercadoPagoUseCase.BuscaPedidoQr(request.Input.ToString());
+                var pedidoQr = await _mercadoPagoUseCase.BuscaPedidoQr(request.Input.ToString());
 
-                    return new GerarQROutput(pedidoQr.QRData, pedidoQr.PedidoId);
-                }
-                catch (DomainException ex)
-                {
-                    await _mediatorHandler.PublicarNotificacao(new DomainNotification(request.MessageType, ex.Message));
-                }
+                return new GerarQROutput(pedidoQr.QRData, pedidoQr.PedidoId);
             }
             else
             {

@@ -1,12 +1,8 @@
-﻿using Domain.Configuration;
-using Domain.MercadoPago;
+﻿using Domain.MercadoPago;
 using Domain.Pedidos;
-using Infra.Pagamento.MercadoPago.Repository;
 using Infra.Tests.Mock.Repositories;
-using Microsoft.Extensions.Options;
-using Moq;
 
-namespace Infra.Tests.MercadoPago.Repository
+namespace Infra.Tests.Pagamento.MercadoPago.Repository
 {
     public class MercadoPagoRepositoryTests
     {
