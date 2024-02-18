@@ -26,6 +26,7 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
 
             // Assert
             Assert.True(result);
+            mediatorHandlerMock.Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Exactly(7));
         }
 
         [Fact]
@@ -99,6 +100,7 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
 
             // Assert
             var badRequestResult = Assert.IsType<bool>(result);
+            mediatorHandlerMock.Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Exactly(7));
             Assert.True(result);
         }
     }
