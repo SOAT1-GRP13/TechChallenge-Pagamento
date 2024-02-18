@@ -19,7 +19,11 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
         private readonly StatusPagamentoCommandHandler _handler;
         public StatusPagamentoCommandHandlerTests()
         {
-            _rabbitMQOptions = new RabbitMQOptions();
+            _rabbitMQOptions = new RabbitMQOptions()
+            {
+                QueuePedidoPago = "pedido_pago",
+                QueuePedidoRecusado = "pedido_recusado"
+            };
             _rabbitMQServiceMock = new Mock<IRabbitMQService>();
             _mediatorHandlerMock = new Mock<IMediatorHandler>();
             _mercadoPagoUseCaseMock = new Mock<IMercadoPagoUseCase>();
@@ -41,10 +45,11 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
 
             // Assert
             Assert.False(result);
+            _mediatorHandlerMock.Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Exactly(3));
         }
 
         [Fact]
-        public async Task Handle_DeveRetornarTrue_QuandoComandoExecutadoComSucesso()
+        public async Task Handle_DeveRetornarTrue_QuandoComandoExecutadoComSucessoEAprovado()
         {
             // Arrange
             var command = new StatusPagamentoCommand(123, "payment");
@@ -56,7 +61,23 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
 
             // Assert
             Assert.True(result);
-            _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(It.IsAny<string>(), It.IsAny<string>()), Times.Once());
+            _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(_rabbitMQOptions.QueuePedidoPago, It.IsAny<string>()), Times.Once());
+        }
+
+        [Fact]
+        public async Task Handle_DeveRetornarTrue_QuandoComandoExecutadoComSucessoERecusado()
+        {
+            // Arrange
+            var command = new StatusPagamentoCommand(123, "payment");
+            var mercadoPagoOrderStatus = new MercadoPagoOrderStatus { Status = "expired", External_reference = Guid.NewGuid().ToString() };
+            _mercadoPagoUseCaseMock.Setup(m => m.PegaStatusPedido(It.IsAny<long>())).ReturnsAsync(mercadoPagoOrderStatus);
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            Assert.True(result);
+            _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(_rabbitMQOptions.QueuePedidoRecusado, It.IsAny<string>()), Times.Once());
         }
 
         [Fact]

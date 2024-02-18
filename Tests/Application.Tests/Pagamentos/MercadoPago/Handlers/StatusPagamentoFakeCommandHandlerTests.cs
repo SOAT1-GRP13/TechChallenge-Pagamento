@@ -1,8 +1,6 @@
 ﻿using Application.Pagamentos.MercadoPago.Commands;
 using Application.Pagamentos.MercadoPago.Handlers;
-using Application.Pagamentos.MercadoPago.UseCases;
 using Domain.Base.Communication.Mediator;
-using Domain.Base.DomainObjects;
 using Domain.Base.Messages.CommonMessages.Notifications;
 using Domain.MercadoPago;
 using Domain.RabbitMQ;
@@ -18,7 +16,11 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
         private readonly StatusPagamentoFakeCommandHandler _handler;
         public StatusPagamentoFakeCommandHandlerTests()
         {
-            _rabbitMQOptions = new RabbitMQOptions();
+            _rabbitMQOptions = new RabbitMQOptions()
+            {
+                QueuePedidoPago = "pedido_pago",
+                QueuePedidoRecusado = "pedido_recusado"
+            };
             _rabbitMQServiceMock = new Mock<IRabbitMQService>();
             _mediatorHandlerMock = new Mock<IMediatorHandler>();
             _handler = new StatusPagamentoFakeCommandHandler(
@@ -28,7 +30,7 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
         }
 
         [Fact]
-        public async Task Handle_DeveRetornarFalse_QuandoValidacaoFalha()
+        public async Task Handle_DeveRetornarFalseETerMensagens_QuandoValidacaoFalha()
         {
             // Arrange
             var command = new StatusPagamentoFakeCommand(Guid.Empty, "", ""); // Dados inválidos para falhar na validação
@@ -38,10 +40,11 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
 
             // Assert
             Assert.False(result);
+            _mediatorHandlerMock.Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Exactly(3));
         }
 
         [Fact]
-        public async Task Handle_DeveRetornarTrue_QuandoComandoExecutadoComSucesso()
+        public async Task Handle_DeveRetornarTrue_QuandoComandoExecutadoComSucessoEPago()
         {
             // Arrange
             var command = new StatusPagamentoFakeCommand(Guid.NewGuid(), "payment", "closed");
@@ -52,7 +55,22 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
 
             // Assert
             Assert.True(result);
-            _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(It.IsAny<string>(), It.IsAny<string>()), Times.Once());
+            _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(_rabbitMQOptions.QueuePedidoPago, It.IsAny<string>()), Times.Once());
+        }
+
+        [Fact]
+        public async Task Handle_DeveRetornarTrue_QuandoComandoExecutadoComSucessoERecusado()
+        {
+            // Arrange
+            var command = new StatusPagamentoFakeCommand(Guid.NewGuid(), "payment", "expired");
+            var mercadoPagoOrderStatus = new MercadoPagoOrderStatus { Status = "closed", External_reference = Guid.NewGuid().ToString() };
+
+            // Act
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            // Assert
+            Assert.True(result);
+            _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(_rabbitMQOptions.QueuePedidoRecusado, It.IsAny<string>()), Times.Once());
         }
     }
 }
