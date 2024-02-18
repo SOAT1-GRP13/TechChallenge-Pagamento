@@ -20,7 +20,6 @@ namespace Infra.Pagamento.MercadoPago.Repository
 
             orderDto.Notification_url = _settings.Notification_url;
 
-
             var client = new HttpClient();
             var request = new HttpRequestMessage(HttpMethod.Post, $"https://api.mercadopago.com/instore/orders/qr/seller/collectors/{_settings.MercadoPagoUserId}/pos/{_settings.External_Pos_Id}/qrs");
             request.Headers.Add("Authorization", $"Bearer {_settings.AccesToken}");

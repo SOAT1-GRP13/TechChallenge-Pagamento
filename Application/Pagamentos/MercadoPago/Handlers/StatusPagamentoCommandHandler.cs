@@ -2,12 +2,10 @@ using System.Text.Json;
 using Application.Pagamentos.MercadoPago.Commands;
 using Application.Pagamentos.MercadoPago.UseCases;
 using Domain.Base.Communication.Mediator;
-using Domain.Base.DomainObjects;
 using Domain.Base.Messages.CommonMessages.Notifications;
 using Domain.Pedidos;
 using Domain.RabbitMQ;
 using MediatR;
-using Microsoft.Extensions.Options;
 
 namespace Application.Pagamentos.MercadoPago.Handlers
 {
@@ -33,27 +31,20 @@ namespace Application.Pagamentos.MercadoPago.Handlers
         {
             if (request.EhValido())
             {
-                try
-                {
-                    var pedidoStatus = await _mercadoPagoUseCase.PegaStatusPedido(request.Id);
-                    var pedido = new PedidoStatus(pedidoStatus.External_reference);
-                    string mensagem = JsonSerializer.Serialize(pedido);
+                var pedidoStatus = await _mercadoPagoUseCase.PegaStatusPedido(request.Id);
+                var pedido = new PedidoStatus(pedidoStatus.External_reference);
+                string mensagem = JsonSerializer.Serialize(pedido);
 
-                    if (pedidoStatus.Status == "closed")
-                    {
-                        _rabbitMQService.PublicaMensagem(_options.QueuePedidoPago, mensagem);
-                    }
-                    else if (pedidoStatus.Status == "expired")
-                    {
-                        _rabbitMQService.PublicaMensagem(_options.QueuePedidoRecusado, mensagem);
-                    }
-
-                    return true;
-                }
-                catch (DomainException ex)
+                if (pedidoStatus.Status == "closed")
                 {
-                    await _mediatorHandler.PublicarNotificacao(new DomainNotification(request.MessageType, ex.Message));
+                    _rabbitMQService.PublicaMensagem(_options.QueuePedidoPago, mensagem);
                 }
+                else if (pedidoStatus.Status == "expired")
+                {
+                    _rabbitMQService.PublicaMensagem(_options.QueuePedidoRecusado, mensagem);
+                }
+
+                return true;
             }
             else
             {

@@ -2,7 +2,6 @@ using Application.Pagamentos.MercadoPago.Boundaries;
 using Application.Pagamentos.MercadoPago.Commands;
 using Application.Pagamentos.MercadoPago.UseCases;
 using Domain.Base.Communication.Mediator;
-using Domain.Base.DomainObjects;
 using Domain.Base.Messages.CommonMessages.Notifications;
 using MediatR;
 

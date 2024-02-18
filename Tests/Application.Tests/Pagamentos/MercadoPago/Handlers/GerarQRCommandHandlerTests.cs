@@ -2,7 +2,6 @@
 using Application.Pagamentos.MercadoPago.Handlers;
 using Application.Pagamentos.MercadoPago.UseCases;
 using Domain.Base.Communication.Mediator;
-using Domain.Base.DomainObjects;
 using Domain.Base.Messages.CommonMessages.Notifications;
 using Domain.MercadoPago;
 using Domain.Pedidos;
@@ -56,31 +55,6 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
         }
 
         [Fact]
-        public async Task Handle_DevePublicarNotificacao_QuandoExcecaoDeDominioOcorrer()
-        {
-            // Arrange
-            var pedidoItem = new PedidoItem(Guid.NewGuid(), "teste", 1, 10, 10);
-            var pedido = new Pedido(Guid.NewGuid(), Guid.NewGuid(), 0, 10,
-             new List<PedidoItem>() { pedidoItem });
-
-            var mercadoPagoOrder = new MercadoPagoOrder(pedido);
-
-
-            var mercadoPagoUseCaseMock = new Mock<IMercadoPagoUseCase>();
-            mercadoPagoUseCaseMock.Setup(m => m.GerarQRCode(It.IsAny<MercadoPagoOrder>())).ThrowsAsync(new DomainException("Erro de domínio"));
-
-            var mediatorHandlerMock = new Mock<IMediatorHandler>();
-            var command = new GerarQRCommand(pedido);
-            var handler = new GerarQRCommandHandler(mediatorHandlerMock.Object, mercadoPagoUseCaseMock.Object);
-
-            // Act
-            var result = await handler.Handle(command, CancellationToken.None);
-
-            // Assert
-            mediatorHandlerMock.Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Exactly(2));
-        }
-
-        [Fact]
         public async Task Handle_DevePublicarNotificacao_QuantoTiverErros()
         {
             // Arrange
@@ -89,7 +63,6 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
             var mercadoPagoOrder = new MercadoPagoOrder {};
 
             var mercadoPagoUseCaseMock = new Mock<IMercadoPagoUseCase>();
-            mercadoPagoUseCaseMock.Setup(m => m.GerarQRCode(It.IsAny<MercadoPagoOrder>())).ThrowsAsync(new DomainException("Erro de domínio"));
 
             var mediatorHandlerMock = new Mock<IMediatorHandler>();
             var command = new GerarQRCommand(pedido);
