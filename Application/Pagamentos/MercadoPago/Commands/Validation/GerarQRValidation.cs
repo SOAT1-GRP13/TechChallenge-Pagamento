@@ -1,32 +1,31 @@
 ﻿using Application.Pagamentos.MercadoPago.Boundaries;
+using Domain.Pedidos;
 using FluentValidation;
 
 namespace Application.Pagamentos.MercadoPago.Commands;
 
-public class GerarQRValidation : AbstractValidator<OrderInput>
+public class GerarQRValidation : AbstractValidator<Pedido>
 {
     public GerarQRValidation()
     {
-        RuleFor(x => x.Title)
+        RuleFor(x => x.PedidoId)
         .NotEmpty()
-        .WithMessage("Titulo é obrigatório");
+        .WithMessage("PedidoId é obrigatório");
 
-        RuleFor(x => x.External_reference)
-        .NotEmpty()
-        .WithMessage("Id do pedido é obrigatório");
-
-        RuleFor(x => x.Expiration_date)
-        .NotEmpty()
-        .WithMessage("Expiration Date é obrigatório");
-
-        RuleFor(x => x.Description)
-         .NotEmpty()
-         .WithMessage("Description é obrigatório");
-
-        RuleFor(x => x.Total_amount)
+        RuleFor(x => x.SubTotal)
         .NotEmpty()
         .NotEqual(0)
-        .WithMessage("Total amount é obrigatório");
+        .WithMessage("SubTotal é obrigatório");
+
+        RuleFor(x => x.ValorTotal)
+        .NotEmpty()
+        .NotEqual(0)
+        .WithMessage("ValorTotal é obrigatório");
+
+        RuleFor(x => x.ClienteId)
+         .NotEmpty()
+         .WithMessage("ClienteId é obrigatório");
+
 
         RuleFor(x => x.Items)
         .NotEmpty()

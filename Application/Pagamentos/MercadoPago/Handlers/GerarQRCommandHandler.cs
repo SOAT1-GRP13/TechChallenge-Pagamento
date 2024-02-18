@@ -1,43 +1,38 @@
-using Application.Pagamentos.MercadoPago.Boundaries;
 using Application.Pagamentos.MercadoPago.Commands;
 using Application.Pagamentos.MercadoPago.UseCases;
-using Application.Pedidos.UseCases;
-using AutoMapper;
 using Domain.Base.Communication.Mediator;
 using Domain.Base.DomainObjects;
 using Domain.Base.Messages.CommonMessages.Notifications;
 using Domain.MercadoPago;
-using Domain.Pedidos;
+using Domain.PedidosQR;
 using MediatR;
 
 namespace Application.Pagamentos.MercadoPago.Handlers
 {
     public class GerarQRCommandHandler :
-        IRequestHandler<GerarQRCommand, GerarQROutput>
+        IRequestHandler<GerarQRCommand, bool>
     {
-
-        private readonly IMapper _mapper;
         private readonly IMercadoPagoUseCase _mercadoPagoUseCase;
         private readonly IMediatorHandler _mediatorHandler;
 
         public GerarQRCommandHandler(
-         IMediatorHandler mediatorHandler, IMercadoPagoUseCase mercadoPagoUseCase, IMapper mapper)
+         IMediatorHandler mediatorHandler, IMercadoPagoUseCase mercadoPagoUseCase)
         {
             _mediatorHandler = mediatorHandler;
             _mercadoPagoUseCase = mercadoPagoUseCase;
-            _mapper = mapper;
         }
 
-        public async Task<GerarQROutput> Handle(GerarQRCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(GerarQRCommand request, CancellationToken cancellationToken)
         {
             if (request.EhValido())
             {
                 try
                 {
-                    var dto = _mapper.Map<MercadoPagoOrder>(request.Input);
-                    var response =  await _mercadoPagoUseCase.GerarQRCode(dto);
+                    var dto = new MercadoPagoOrder(request.Input);
+                    var response = await _mercadoPagoUseCase.GerarQRCode(dto);
 
-                    return new GerarQROutput(response);
+                    var pedidoQr = new QrCodeDTO(response, request.Input.PedidoId.ToString());
+                    await _mercadoPagoUseCase.SalvaPedidoQR(pedidoQr);
                 }
                 catch (DomainException ex)
                 {
@@ -51,7 +46,7 @@ namespace Application.Pagamentos.MercadoPago.Handlers
                     await _mediatorHandler.PublicarNotificacao(new DomainNotification(request.MessageType, error.ErrorMessage));
                 }
             }
-            return new GerarQROutput();
+            return true;
         }
     }
 }

@@ -16,15 +16,15 @@ namespace Domain.MercadoPago
             Items = new List<OrderItem>();
         }
 
-        public MercadoPagoOrder(Pedido pedido, List<OrderItem> orderItems, string notificationUrl)
+        public MercadoPagoOrder(Pedido pedido)
         {
-            External_reference = pedido.Id.ToString();
+            External_reference = pedido.PedidoId.ToString();
             Title = "Pedido confirmado"; //TODO preencher com titulo do pedido
-            Notification_url = notificationUrl;
+            Notification_url = string.Empty;
             Description = "Descrição do pedido";
             Expiration_date = DateTime.Now.AddMinutes(20).ToString("yyyy-MM-ddTHH\\:mm\\:ss.fffzzz");
             Total_amount = pedido.ValorTotal;
-            Items = orderItems;
+            Items = pedido.Items.Select(x => new OrderItem(x)).ToList();
         }
 
         public string External_reference { get; set; }

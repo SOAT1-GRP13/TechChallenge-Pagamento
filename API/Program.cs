@@ -1,13 +1,23 @@
-using API.Data;
 using API.Setup;
-using Infra.Pedidos;
 using System.Reflection;
-using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Filters;
 using Domain.Configuration;
-using Application.Pagamentos.AutoMapper;
+using Infra.RabbitMQ;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
+using Domain.RabbitMQ;
+using Infra.RabbitMQ.Consumers;
+using Domain.PedidosQR;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configurando LoggerFactory e criando uma inst�ncia de ILogger
+var loggerFactory = LoggerFactory.Create(builder =>
+{
+    builder.AddConsole();
+    builder.AddDebug();
+});
+var logger = loggerFactory.CreateLogger<Program>();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -16,19 +26,36 @@ string secret = "";
 
 if (builder.Environment.IsProduction())
 {
+    logger.LogInformation("Ambiente de Producao detectado.");
+
     builder.Configuration.AddAmazonSecretsManager("us-west-2", "pagamento-secret");
 
     secret = builder.Configuration.GetSection("ClientSecret").Value ?? string.Empty;
 }
 else
 {
+    logger.LogInformation("Ambiente de Desenvolvimento/Local detectado.");
 
     secret = builder.Configuration.GetSection("ClientSecret").Value ?? string.Empty;
+
+    var rabbitMQOptions = new RabbitMQOptions();
+    builder.Configuration.GetSection("RabbitMQ").Bind(rabbitMQOptions);
+    builder.Services.AddSingleton(rabbitMQOptions);
+
+    var dynamoLocalOptions = new DynamoLocalOptions();
+    builder.Configuration.GetSection("DynamoLocal").Bind(dynamoLocalOptions);
+    builder.Services.AddSingleton(dynamoLocalOptions);
+
+    logger.LogInformation(dynamoLocalOptions.ServiceUrl);
 }
+
+var awsOptions = builder.Configuration.GetAWSOptions();
+builder.Services.AddDefaultAWSOptions(awsOptions);
+builder.Services.AddAWSService<IAmazonDynamoDB>();
+builder.Services.AddScoped<IDynamoDBContext, DynamoDBContext>();
 
 builder.Services.Configure<Secrets>(builder.Configuration);
 
-builder.Services.AddAutoMapper(typeof(PagamentosMappingProfile));
 // builder.Services.AddAuthenticationJWT(secret);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -37,6 +64,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGenConfig();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
+builder.Services.AddSingleton<RabbitMQModelFactory>();
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var modelFactory = serviceProvider.GetRequiredService<RabbitMQModelFactory>();
+    return modelFactory.CreateModel();
+});
+builder.Services.AddSingleton<IRabbitMQService, RabbitMQService>();
+builder.Services.AddHostedService<PedidoConfirmadoSubscriber>();
 
 builder.Services.RegisterServices();
 

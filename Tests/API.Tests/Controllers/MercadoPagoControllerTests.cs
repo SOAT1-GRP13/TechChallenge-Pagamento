@@ -7,6 +7,7 @@ using Application.Pagamentos.MercadoPago.Commands;
 using Domain.Base.Messages.CommonMessages.Notifications;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Pagamentos.MercadoPago.Boundaries;
+using Microsoft.Extensions.Hosting;
 
 namespace API.Tests.Controllers
 {
@@ -60,7 +61,7 @@ namespace API.Tests.Controllers
             );
 
             // Act
-            var result = await mercadoPagoController.WebHookMercadoPago(0, null);
+            var result = await mercadoPagoController.WebHookMercadoPago(0, "");
 
             // Assert
             var badRequestResult = Assert.IsType<ObjectResult>(result);
@@ -72,40 +73,57 @@ namespace API.Tests.Controllers
         }
 
         [Fact]
-        public async Task QRMercadoPago_DeveRetornarOk_QuandoComandoExecutadoComSucesso()
+        public async Task FakeWebhook_DeveRetornarOk_QuandoComandoExecutadoComSucesso()
         {
             // Arrange
             var mediatorHandlerMock = new Mock<IMediatorHandler>();
             var domainNotificationHandler = new DomainNotificationHandler();
             var mercadoPagoController = new MercadoPagoController(domainNotificationHandler, mediatorHandlerMock.Object);
 
-            var orderInput = new OrderInput { };
-            var gerarQROutput = new GerarQROutput("qr_data_sample");
-
-            mediatorHandlerMock.Setup(m => m.EnviarComando<GerarQRCommand, GerarQROutput>(It.IsAny<GerarQRCommand>()))
-                               .ReturnsAsync(gerarQROutput);
+            mediatorHandlerMock.Setup(m => m.EnviarComando<StatusPagamentoFakeCommand, bool>(It.IsAny<StatusPagamentoFakeCommand>()))
+                               .ReturnsAsync(true);
 
             // Act
-            var result = await mercadoPagoController.QRMercadoPago(orderInput);
+            var result = await mercadoPagoController.FakeWebhook(Guid.NewGuid(), "sucesso", "closed");
+
+            // Assert
+            Assert.IsType<OkResult>(result);
+        }
+
+
+        [Fact]
+        public async Task BuscaQR_DeveRetornarOk_QuandoComandoExecutadoComSucesso()
+        {
+            // Arrange
+            var mediatorHandlerMock = new Mock<IMediatorHandler>();
+            var domainNotificationHandler = new DomainNotificationHandler();
+            var mercadoPagoController = new MercadoPagoController(domainNotificationHandler, mediatorHandlerMock.Object);
+
+            var guidResult = Guid.NewGuid();
+            var gerarQrResult = new GerarQROutput("sucesso", guidResult.ToString());
+
+            mediatorHandlerMock.Setup(m => m.EnviarComando<BuscarQRCommand, GerarQROutput>(It.IsAny<BuscarQRCommand>()))
+                               .ReturnsAsync(gerarQrResult);
+
+            // Act
+            var result = await mercadoPagoController.BuscaQR(guidResult);
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
             var okResult = result as OkObjectResult;
-            Assert.Equal(gerarQROutput, okResult?.Value);
+            Assert.Equal(gerarQrResult, okResult?.Value);
         }
 
         [Fact]
-        public async Task QRMercadoPago_DeveRetornarBadRequest_QuandoComandoFalhaNaValidacao()
+        public async Task BuscaQR_DeveRetornarBadRequest_QuandoComandoFalhaNaValidacao()
         {
             // Arrange
             var mediatorHandlerMock = new Mock<IMediatorHandler>();
             var domainNotificationHandler = new DomainNotificationHandler();
             var mercadoPagoController = new MercadoPagoController(domainNotificationHandler, mediatorHandlerMock.Object);
 
-            var orderInput = new OrderInput(); // Dados inválidos para falhar na validação
-
-            mediatorHandlerMock.Setup(m => m.EnviarComando<GerarQRCommand, GerarQROutput>(It.IsAny<GerarQRCommand>()))
-                .Callback<GerarQRCommand>(cmd =>
+            mediatorHandlerMock.Setup(m => m.EnviarComando<BuscarQRCommand, GerarQROutput>(It.IsAny<BuscarQRCommand>()))
+                .Callback<BuscarQRCommand>(cmd =>
                 {
                     if (!cmd.EhValido())
                     {
@@ -118,19 +136,13 @@ namespace API.Tests.Controllers
                 .ReturnsAsync(new GerarQROutput());
 
             // Act
-            var result = await mercadoPagoController.QRMercadoPago(orderInput);
+            var result = await mercadoPagoController.BuscaQR(Guid.Empty);
 
             // Assert
             var badRequestResult = Assert.IsType<ObjectResult>(result);
             var mensagensErro = Assert.IsType<List<string>>(badRequestResult.Value);
             Assert.Equal(400, badRequestResult.StatusCode);
-            Assert.Contains("Titulo é obrigatório", mensagensErro);
-            Assert.Contains("Id do pedido é obrigatório", mensagensErro);
-            Assert.Contains("Expiration Date é obrigatório", mensagensErro);
-            Assert.Contains("Description é obrigatório", mensagensErro);
-            Assert.Contains("'Total_amount' must not be empty.", mensagensErro);
-            Assert.Contains("Total amount é obrigatório", mensagensErro);
-            Assert.Contains("Ao menos 1 item é necessario", mensagensErro);
+            Assert.Contains("PedidoId é obrigatório", mensagensErro);
         }
     }
 }

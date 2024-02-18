@@ -1,12 +1,13 @@
+using System.Text.Json;
 using Application.Pagamentos.MercadoPago.Commands;
 using Application.Pagamentos.MercadoPago.UseCases;
-using Application.Pedidos.UseCases;
 using Domain.Base.Communication.Mediator;
 using Domain.Base.DomainObjects;
 using Domain.Base.Messages.CommonMessages.Notifications;
-using Domain.MercadoPago;
 using Domain.Pedidos;
+using Domain.RabbitMQ;
 using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace Application.Pagamentos.MercadoPago.Handlers
 {
@@ -14,16 +15,18 @@ namespace Application.Pagamentos.MercadoPago.Handlers
         IRequestHandler<StatusPagamentoCommand, bool>
     {
 
-        private readonly IPedidoUseCase _pedidoUseCase;
         private readonly IMercadoPagoUseCase _mercadoPagoUseCase;
+        private readonly IRabbitMQService _rabbitMQService;
         private readonly IMediatorHandler _mediatorHandler;
+        private readonly RabbitMQOptions _options;
 
-        public StatusPagamentoCommandHandler(IPedidoUseCase pedidoUseCase,
-         IMediatorHandler mediatorHandler, IMercadoPagoUseCase mercadoPagoUseCase)
+        public StatusPagamentoCommandHandler(
+         IMediatorHandler mediatorHandler, IMercadoPagoUseCase mercadoPagoUseCase, IRabbitMQService rabbitMQService, RabbitMQOptions options)
         {
-            _pedidoUseCase = pedidoUseCase;
             _mediatorHandler = mediatorHandler;
             _mercadoPagoUseCase = mercadoPagoUseCase;
+            _rabbitMQService = rabbitMQService;
+            _options = options;
         }
 
         public async Task<bool> Handle(StatusPagamentoCommand request, CancellationToken cancellationToken)
@@ -33,14 +36,16 @@ namespace Application.Pagamentos.MercadoPago.Handlers
                 try
                 {
                     var pedidoStatus = await _mercadoPagoUseCase.PegaStatusPedido(request.Id);
+                    var pedido = new PedidoStatus(pedidoStatus.External_reference);
+                    string mensagem = JsonSerializer.Serialize(pedido);
 
                     if (pedidoStatus.Status == "closed")
                     {
-                        await _pedidoUseCase.TrocaStatusPedido(Guid.Parse(pedidoStatus.External_reference), PedidoStatus.Pago);
+                        _rabbitMQService.PublicaMensagem(_options.QueuePedidoPago, mensagem);
                     }
                     else if (pedidoStatus.Status == "expired")
                     {
-                        await _pedidoUseCase.TrocaStatusPedido(Guid.Parse(pedidoStatus.External_reference), PedidoStatus.Cancelado);
+                        _rabbitMQService.PublicaMensagem(_options.QueuePedidoRecusado, mensagem);
                     }
 
                     return true;
