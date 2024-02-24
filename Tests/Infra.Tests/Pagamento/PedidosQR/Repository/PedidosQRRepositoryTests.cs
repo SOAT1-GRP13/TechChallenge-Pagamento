@@ -1,14 +1,8 @@
-using Domain.Configuration;
-using Domain.MercadoPago;
-using Domain.Pedidos;
 using Domain.PedidosQR;
 using Domain.PedidosQR.Interface;
-using Infra.Pagamento.MercadoPago.Repository;
 using Infra.Tests.Mock.Repositories;
-using Microsoft.Extensions.Options;
-using Moq;
 
-namespace Infra.Tests.PedidosQR.Repository
+namespace Infra.Tests.Pagamento.PedidosQR.Repository
 {
     public class PedidosQRRepositoryTests
     {
@@ -33,17 +27,6 @@ namespace Infra.Tests.PedidosQR.Repository
             //Assert
             Assert.True(true);
         }
-
-        // [Fact]
-        // public async Task DeveEstourarException_Se_Algo_Estiver_Configurado_Errado()
-        // {
-        //     //Arrange
-        //     var qrCodeDto = new QrCodeDTO("erro", "erro");
-
-        //     // Act
-        //     //Assert
-        //     await Assert.ThrowsAsync<Exception>(() => _repository.SalvaPedidoQR(qrCodeDto));
-        // }
 
         [Fact]
         public async Task AoBuscarQR_DeveRetornarOsDados_QuandoExistirOPedido()

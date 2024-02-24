@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Application.Pagamentos.MercadoPago.Commands;
 using Domain.Base.Communication.Mediator;
-using Domain.Base.DomainObjects;
 using Domain.Base.Messages.CommonMessages.Notifications;
 using Domain.Pedidos;
 using Domain.RabbitMQ;

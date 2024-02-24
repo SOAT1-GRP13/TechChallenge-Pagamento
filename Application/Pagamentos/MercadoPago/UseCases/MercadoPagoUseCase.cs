@@ -8,7 +8,7 @@ namespace Application.Pagamentos.MercadoPago.Gateways
     public class MercadoPagoUseCase : IMercadoPagoUseCase
     {
         private readonly IMercadoPagoRepository _mercadoPagoRepository;
-                private readonly IPedidosQRRepository _pedidoQrRepository;
+        private readonly IPedidosQRRepository _pedidoQrRepository;
 
         public MercadoPagoUseCase(IMercadoPagoRepository mercadoPagoRepository, IPedidosQRRepository pedidoQrRepository)
         {

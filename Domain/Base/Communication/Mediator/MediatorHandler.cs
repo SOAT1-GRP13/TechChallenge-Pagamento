@@ -21,13 +21,6 @@ namespace Domain.Base.Communication.Mediator
             return await _mediator.Send(command);
         }
 
-        public async Task PublicarEvento<T>(T evento) where T : Event
-        {
-            await _mediator.Publish(evento);
-            //await _eventSourcingRepository.SalvarEvento(evento);
-
-        }
-
         public async Task PublicarNotificacao<T>(T notificacao) where T : DomainNotification
         {
             await _mediator.Publish(notificacao);
