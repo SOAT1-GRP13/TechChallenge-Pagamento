@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Pedidos\**" />
+    <EmbeddedResource Remove="Pedidos\**" />
+    <None Remove="Pedidos\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
@@ -25,6 +31,5 @@
     <Folder Include="Pagamentos/MercadoPago/Commands/" />
     <Folder Include="Pagamentos\MercadoPago\" />
     <Folder Include="Pagamentos\MercadoPago\Boundaries\" />
-    <Folder Include="Pedidos\" />
   </ItemGroup>
 </Project>

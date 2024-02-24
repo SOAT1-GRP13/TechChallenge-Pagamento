@@ -24,13 +24,12 @@ namespace Infra.RabbitMQ.Consumers
         {
             _scopeFactory = scopeFactory;
             _nomeDaFila = options.QueuePedidoConfirmado;
+            var nomeExchange = options.ExchangePedidoConfirmado;
 
             _channel = model;
-            _channel.ExchangeDeclare(exchange: "trigger", type: ExchangeType.Fanout);
+            _channel.ExchangeDeclare(exchange: nomeExchange, type: ExchangeType.Fanout);
             _channel.QueueDeclare(queue: _nomeDaFila, durable: true, exclusive: false, autoDelete: false, arguments: null);
-            _channel.QueueBind(queue: _nomeDaFila,
-                exchange: "trigger",
-                routingKey: "");
+            _channel.QueueBind(queue: _nomeDaFila, exchange: nomeExchange, routingKey: "");
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)

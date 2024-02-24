@@ -26,7 +26,7 @@ namespace Infra.Tests.RabbitMQ.Consumers
             mockScope.Setup(x => x.ServiceProvider).Returns(mockServiceProvider.Object);
             mockServiceProvider.Setup(x => x.GetService(typeof(IMediatorHandler))).Returns(mockMediatorHandler.Object);
 
-            var options = new RabbitMQOptions { QueuePedidoPago = "testQueue" };
+            var options = new RabbitMQOptions { ExchangePedidoPago = "testQueue" };
             var serverFake = new PedidoConfirmadoSubscriberFake(mockScopeFactory.Object, options, mockModel.Object);
             var consumer = new EventingBasicConsumer(mockModel.Object);
 
@@ -71,7 +71,7 @@ namespace Infra.Tests.RabbitMQ.Consumers
             mockScope.Setup(x => x.ServiceProvider).Returns(mockServiceProvider.Object);
             mockServiceProvider.Setup(x => x.GetService(typeof(IMediatorHandler))).Returns(mockMediatorHandler.Object);
 
-            var options = new RabbitMQOptions { QueuePedidoPago = "testQueue" };
+            var options = new RabbitMQOptions { ExchangePedidoPago = "testQueue" };
             var serverFake = new PedidoConfirmadoSubscriberFake(mockScopeFactory.Object, options, mockModel.Object);
             var consumer = new EventingBasicConsumer(mockModel.Object);
 

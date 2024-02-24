@@ -18,8 +18,8 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
         {
             _rabbitMQOptions = new RabbitMQOptions()
             {
-                QueuePedidoPago = "pedido_pago",
-                QueuePedidoRecusado = "pedido_recusado"
+                ExchangePedidoPago = "pedido_pago",
+                ExchangePedidoRecusado = "pedido_recusado"
             };
             _rabbitMQServiceMock = new Mock<IRabbitMQService>();
             _mediatorHandlerMock = new Mock<IMediatorHandler>();
@@ -55,7 +55,7 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
 
             // Assert
             Assert.True(result);
-            _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(_rabbitMQOptions.QueuePedidoPago, It.IsAny<string>()), Times.Once());
+            _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(_rabbitMQOptions.ExchangePedidoPago, It.IsAny<string>()), Times.Once());
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
 
             // Assert
             Assert.True(result);
-            _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(_rabbitMQOptions.QueuePedidoRecusado, It.IsAny<string>()), Times.Once());
+            _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(_rabbitMQOptions.ExchangePedidoRecusado, It.IsAny<string>()), Times.Once());
         }
     }
 }
