@@ -37,11 +37,11 @@ namespace Application.Pagamentos.MercadoPago.Handlers
 
                 if (request.Status == "closed")
                 {
-                    _rabbitMQService.PublicaMensagem(_options.QueuePedidoPago, mensagem);
+                    _rabbitMQService.PublicaMensagem(_options.ExchangePedidoPago, mensagem);
                 }
                 else
                 {
-                    _rabbitMQService.PublicaMensagem(_options.QueuePedidoRecusado, mensagem);
+                    _rabbitMQService.PublicaMensagem(_options.ExchangePedidoRecusado, mensagem);
                 }
 
                 return true;
