@@ -67,7 +67,7 @@ namespace API.Tests.Controllers
             var badRequestResult = Assert.IsType<ObjectResult>(result);
             var mensagensErro = Assert.IsType<List<string>>(badRequestResult.Value);
             Assert.Equal(400, badRequestResult.StatusCode);
-            Assert.Contains("'Id' must not be empty.", mensagensErro);
+            Assert.Contains("'Id' deve ser informado.", mensagensErro);
             Assert.Contains("Action é obrigatório", mensagensErro);
             Assert.Contains("Topic é obrigatório", mensagensErro);
         }

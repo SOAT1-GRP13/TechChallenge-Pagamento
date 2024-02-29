@@ -38,10 +38,6 @@ else
 
     secret = builder.Configuration.GetSection("ClientSecret").Value ?? string.Empty;
 
-    var rabbitMQOptions = new RabbitMQOptions();
-    builder.Configuration.GetSection("RabbitMQ").Bind(rabbitMQOptions);
-    builder.Services.AddSingleton(rabbitMQOptions);
-
     var dynamoLocalOptions = new DynamoLocalOptions();
     builder.Configuration.GetSection("DynamoLocal").Bind(dynamoLocalOptions);
     builder.Services.AddSingleton(dynamoLocalOptions);

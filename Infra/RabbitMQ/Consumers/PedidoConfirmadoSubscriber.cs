@@ -8,6 +8,8 @@ using Domain.Base.Communication.Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Pagamentos.MercadoPago.Commands;
 using Domain.RabbitMQ;
+using Domain.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Infra.RabbitMQ.Consumers
 {
@@ -19,12 +21,12 @@ namespace Infra.RabbitMQ.Consumers
 
         public PedidoConfirmadoSubscriber(
             IServiceScopeFactory scopeFactory,
-            RabbitMQOptions options,
+            IOptions<Secrets> options,
             IModel model)
         {
             _scopeFactory = scopeFactory;
-            _nomeDaFila = options.QueuePedidoConfirmado;
-            var nomeExchange = options.ExchangePedidoConfirmado;
+            _nomeDaFila = options.Value.QueuePedidoConfirmado;
+            var nomeExchange = options.Value.ExchangePedidoConfirmado;
 
             _channel = model;
             _channel.ExchangeDeclare(exchange: nomeExchange, type: ExchangeType.Fanout);
