@@ -20,7 +20,7 @@ namespace Infra.RabbitMQ
             var factory = new ConnectionFactory()
             {
                 HostName = _settings.Rabbit_Hostname,
-                Port = _settings.Rabbit_Port,
+                Port = Convert.ToInt32(_settings.Rabbit_Port),
                 UserName = _settings.Rabbit_Username,
                 Password = _settings.Rabbit_Password,
                 VirtualHost = _settings.Rabbit_VirtualHost

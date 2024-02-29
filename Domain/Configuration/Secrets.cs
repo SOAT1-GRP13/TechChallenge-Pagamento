@@ -17,6 +17,7 @@ namespace Domain.Configuration
             ExchangePedidoPago = string.Empty;
             QueuePedidoConfirmado = string.Empty;
             Rabbit_VirtualHost = string.Empty;
+            Rabbit_Port = string.Empty;
         }
 
         public string MercadoPagoUserId { get; set; }
@@ -24,7 +25,7 @@ namespace Domain.Configuration
         public string Notification_url { get; set; }
         public string External_Pos_Id { get; set; }
         public string Rabbit_Hostname { get; set; }
-        public int Rabbit_Port { get; set; }
+        public string Rabbit_Port { get; set; }
         public string Rabbit_Username { get; set; }
         public string Rabbit_Password { get; set; }
         public string ExchangePedidoConfirmado { get; set; }
