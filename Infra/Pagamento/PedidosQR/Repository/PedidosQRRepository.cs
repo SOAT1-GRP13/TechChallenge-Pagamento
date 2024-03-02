@@ -11,7 +11,6 @@ namespace Infra.Pagamento.PedidosQR.Repository
 
         public PedidosQRRepository(IAmazonDynamoDB client, DynamoLocalOptions options)
         {
-            _dynamoDBContext = new DynamoDBContext(client);
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             if (!string.IsNullOrEmpty(env) && env == "Development")
             {
