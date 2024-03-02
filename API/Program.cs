@@ -37,12 +37,6 @@ else
     logger.LogInformation("Ambiente de Desenvolvimento/Local detectado.");
 
     secret = builder.Configuration.GetSection("ClientSecret").Value ?? string.Empty;
-
-    var dynamoLocalOptions = new DynamoLocalOptions();
-    builder.Configuration.GetSection("DynamoLocal").Bind(dynamoLocalOptions);
-    builder.Services.AddSingleton(dynamoLocalOptions);
-
-    logger.LogInformation(dynamoLocalOptions.ServiceUrl);
 }
 
 var awsOptions = builder.Configuration.GetAWSOptions();
@@ -51,6 +45,10 @@ builder.Services.AddAWSService<IAmazonDynamoDB>();
 builder.Services.AddScoped<IDynamoDBContext, DynamoDBContext>();
 
 builder.Services.Configure<Secrets>(builder.Configuration);
+
+var dynamoLocalOptions = new DynamoLocalOptions();
+builder.Configuration.GetSection("DynamoLocal").Bind(dynamoLocalOptions);
+builder.Services.AddSingleton(dynamoLocalOptions);
 
 // builder.Services.AddAuthenticationJWT(secret);
 
