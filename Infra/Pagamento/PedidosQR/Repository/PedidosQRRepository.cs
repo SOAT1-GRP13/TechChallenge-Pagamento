@@ -2,7 +2,6 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Domain.PedidosQR;
 using Domain.PedidosQR.Interface;
-using Microsoft.Extensions.Hosting;
 
 namespace Infra.Pagamento.PedidosQR.Repository
 {
@@ -12,20 +11,21 @@ namespace Infra.Pagamento.PedidosQR.Repository
 
         public PedidosQRRepository(IAmazonDynamoDB client, DynamoLocalOptions options)
         {
-            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            if (!string.IsNullOrEmpty(env) && env == "Development")
-            {
-                AmazonDynamoDBConfig clientConfig = new AmazonDynamoDBConfig
-                {
-                    ServiceURL = options.ServiceUrl
-                };
-                AmazonDynamoDBClient dynamoClient = new AmazonDynamoDBClient("Aksdjaksdhueiadqwert", "dshdajksdhajskdhasjkdhasjkdashkjqwertyu", clientConfig);
-                _dynamoDBContext = new DynamoDBContext(dynamoClient);
-            }
-            else
-            {
-                _dynamoDBContext = new DynamoDBContext(client);
-            }
+            _dynamoDBContext = new DynamoDBContext(client);
+            // var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            // if (!string.IsNullOrEmpty(env) && env == "Development")
+            // {
+            //     AmazonDynamoDBConfig clientConfig = new AmazonDynamoDBConfig
+            //     {
+            //         ServiceURL = options.ServiceUrl
+            //     };
+            //     AmazonDynamoDBClient dynamoClient = new AmazonDynamoDBClient("Aksdjaksdhueiadqwert", "dshdajksdhajskdhasjkdhasjkdashkjqwertyu", clientConfig);
+            //     _dynamoDBContext = new DynamoDBContext(dynamoClient);
+            // }
+            // else
+            // {
+            //     _dynamoDBContext = new DynamoDBContext(client);
+            // }
         }
         public async Task SalvaPedidoQR(QrCodeDTO dto)
         {
