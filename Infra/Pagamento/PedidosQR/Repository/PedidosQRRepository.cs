@@ -2,7 +2,6 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Domain.PedidosQR;
 using Domain.PedidosQR.Interface;
-using Microsoft.Extensions.Hosting;
 
 namespace Infra.Pagamento.PedidosQR.Repository
 {

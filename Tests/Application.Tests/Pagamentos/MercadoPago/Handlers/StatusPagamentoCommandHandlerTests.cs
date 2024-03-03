@@ -3,8 +3,10 @@ using Application.Pagamentos.MercadoPago.Handlers;
 using Application.Pagamentos.MercadoPago.UseCases;
 using Domain.Base.Communication.Mediator;
 using Domain.Base.Messages.CommonMessages.Notifications;
+using Domain.Configuration;
 using Domain.MercadoPago;
 using Domain.RabbitMQ;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace Application.Tests.Pagamentos.MercadoPago.Handlers
@@ -14,15 +16,19 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
         private readonly Mock<IMercadoPagoUseCase> _mercadoPagoUseCaseMock;
         private readonly Mock<IMediatorHandler> _mediatorHandlerMock;
         private readonly Mock<IRabbitMQService> _rabbitMQServiceMock;
-        private readonly RabbitMQOptions _rabbitMQOptions;
+        private readonly Mock<IOptions<Secrets>> _mockOptions;
+        private readonly Secrets _secrets;
         private readonly StatusPagamentoCommandHandler _handler;
         public StatusPagamentoCommandHandlerTests()
         {
-            _rabbitMQOptions = new RabbitMQOptions()
+            _mockOptions = new Mock<IOptions<Secrets>>();
+            _secrets = new Secrets () 
             {
-                ExchangePedidoPago = "pedido_pago",
-                ExchangePedidoRecusado = "pedido_recusado"
+                ExchangePedidoPago = "exc_pedido_pago",
+                ExchangePedidoRecusado = "exc_pedido_recusado"
+
             };
+            _mockOptions.Setup(opt => opt.Value).Returns(_secrets);
             _rabbitMQServiceMock = new Mock<IRabbitMQService>();
             _mediatorHandlerMock = new Mock<IMediatorHandler>();
             _mercadoPagoUseCaseMock = new Mock<IMercadoPagoUseCase>();
@@ -30,7 +36,8 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
                 _mediatorHandlerMock.Object,
                 _mercadoPagoUseCaseMock.Object,
             _rabbitMQServiceMock.Object,
-             _rabbitMQOptions);
+            _mockOptions.Object
+            );
         }
 
         [Fact]
@@ -60,7 +67,7 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
 
             // Assert
             Assert.True(result);
-            _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(_rabbitMQOptions.ExchangePedidoPago, It.IsAny<string>()), Times.Once());
+            _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(_secrets.ExchangePedidoPago, It.IsAny<string>()), Times.Once());
         }
 
         [Fact]
@@ -76,7 +83,7 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
 
             // Assert
             Assert.True(result);
-            _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(_rabbitMQOptions.ExchangePedidoRecusado, It.IsAny<string>()), Times.Once());
+            _rabbitMQServiceMock.Verify(r => r.PublicaMensagem(_secrets.ExchangePedidoRecusado, It.IsAny<string>()), Times.Once());
         }
 
     }

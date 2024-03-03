@@ -26,7 +26,8 @@ namespace Application.Pagamentos.MercadoPago.Handlers
             {
                 var pedidoQr = await _mercadoPagoUseCase.BuscaPedidoQr(request.Input.ToString());
 
-                return new GerarQROutput(pedidoQr.QRData, pedidoQr.PedidoId);
+                if (!string.IsNullOrEmpty(pedidoQr.PedidoId))
+                    return new GerarQROutput(pedidoQr.QRData, pedidoQr.PedidoId);
             }
             else
             {

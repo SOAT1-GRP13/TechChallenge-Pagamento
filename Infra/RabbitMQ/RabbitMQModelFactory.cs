@@ -1,4 +1,5 @@
-﻿using Domain.RabbitMQ;
+﻿using Domain.Configuration;
+using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using System.Diagnostics.CodeAnalysis;
 
@@ -7,22 +8,22 @@ namespace Infra.RabbitMQ
     [ExcludeFromCodeCoverage]
     public class RabbitMQModelFactory
     {
-        private readonly RabbitMQOptions _options;
+        private readonly Secrets _settings;
 
-        public RabbitMQModelFactory(RabbitMQOptions options)
+        public RabbitMQModelFactory(IOptions<Secrets> options)
         {
-            _options = options;
+            _settings = options.Value;
         }
 
         public IModel CreateModel()
         {
             var factory = new ConnectionFactory()
             {
-                HostName = _options.Hostname,
-                Port = _options.Port,
-                UserName = _options.Username,
-                Password = _options.Password,
-                VirtualHost = _options.VirtualHost
+                HostName = _settings.Rabbit_Hostname,
+                Port = Convert.ToInt32(_settings.Rabbit_Port),
+                UserName = _settings.Rabbit_Username,
+                Password = _settings.Rabbit_Password,
+                VirtualHost = _settings.Rabbit_VirtualHost
             };
 
             var connection = factory.CreateConnection();

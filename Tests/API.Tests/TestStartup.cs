@@ -32,10 +32,6 @@ namespace API.Tests
             services.AddLogging();
             services.AddSingleton<IConfiguration>(configuration);
 
-            var rabbitMQOptions = new RabbitMQOptions();
-            configuration.GetSection("RabbitMQ").Bind(rabbitMQOptions);
-            services.AddSingleton(rabbitMQOptions);
-
             var dynamoLocalOptions = new DynamoLocalOptions();
             configuration.GetSection("DynamoLocal").Bind(dynamoLocalOptions);
             services.AddSingleton(dynamoLocalOptions);
