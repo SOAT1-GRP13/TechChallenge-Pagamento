@@ -8,7 +8,7 @@ namespace Domain.Tests.PedidosQR
         public void DeveConstruirCorretamente_AoChamarConstrutor()
         {
             var pedidoId = Guid.NewGuid().ToString();
-            var pedidoQr = new PedidoQR(pedidoId, "teste");
+            var pedidoQr = new PedidoQR(pedidoId, "teste", string.Empty);
 
 
             Assert.Equal(pedidoId, pedidoQr.PedidoId);

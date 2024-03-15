@@ -28,7 +28,7 @@ namespace Infra.Pagamento.PedidosQR.Repository
         }
         public async Task SalvaPedidoQR(QrCodeDTO dto)
         {
-            var pedidoQR = new PedidoQR(dto.PedidoId, dto.QRData);
+            var pedidoQR = new PedidoQR(dto.PedidoId, dto.QRData, dto.ClienteEmail);
 
             await _dynamoDBContext.SaveAsync(pedidoQR);
 
@@ -39,7 +39,7 @@ namespace Infra.Pagamento.PedidosQR.Repository
             var pedidoQR = await _dynamoDBContext.LoadAsync<PedidoQR>(pedidoId);
 
             if (pedidoQR != null)
-                return new QrCodeDTO(pedidoQR.QrData, pedidoId);
+                return new QrCodeDTO(pedidoQR.QrData, pedidoId, pedidoQR.ClienteEmail);
 
             return new QrCodeDTO();
         }

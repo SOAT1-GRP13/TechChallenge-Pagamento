@@ -10,7 +10,7 @@ namespace Application.Tests.Mock.Repositories
         {
             var mockRepo = new Mock<IPedidosQRRepository>();
 
-            var qrCodeDTO = new QrCodeDTO("sucesso", "sucesso");
+            var qrCodeDTO = new QrCodeDTO("sucesso", "sucesso", string.Empty);
 
             mockRepo.Setup(r => r.BuscaPedidoQr(It.IsAny<string>())).ReturnsAsync(qrCodeDTO);
 

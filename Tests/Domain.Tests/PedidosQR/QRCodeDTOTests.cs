@@ -7,7 +7,7 @@ namespace Domain.Tests.PedidosQR
         [Fact]
         public void DeveConstruirCorretamente_AoChamarConstrutor()
         {
-            var qrCodeDTO = new QrCodeDTO("teste", "teste");
+            var qrCodeDTO = new QrCodeDTO("teste", "teste", string.Empty);
 
 
             Assert.Equal("teste", qrCodeDTO.PedidoId);

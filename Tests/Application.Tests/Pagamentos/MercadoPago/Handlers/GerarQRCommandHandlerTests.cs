@@ -34,7 +34,7 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
             // Arrange
             var pedidoItem = new PedidoItem(Guid.NewGuid(), "teste", 1, 10, 10);
             var pedido = new Pedido(Guid.NewGuid(), Guid.NewGuid(), 0, 10,
-             new List<PedidoItem>() { pedidoItem });
+             new List<PedidoItem>() { pedidoItem }, string.Empty);
 
             var mercadoPagoOrder = new MercadoPagoOrder(pedido);
 

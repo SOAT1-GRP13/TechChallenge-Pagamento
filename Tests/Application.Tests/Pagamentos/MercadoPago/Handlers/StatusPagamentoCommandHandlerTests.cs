@@ -5,6 +5,7 @@ using Domain.Base.Communication.Mediator;
 using Domain.Base.Messages.CommonMessages.Notifications;
 using Domain.Configuration;
 using Domain.MercadoPago;
+using Domain.PedidosQR;
 using Domain.RabbitMQ;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -60,7 +61,9 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
             // Arrange
             var command = new StatusPagamentoCommand(123, "payment");
             var mercadoPagoOrderStatus = new MercadoPagoOrderStatus { Status = "closed", External_reference = Guid.NewGuid().ToString() };
+            var qrCodeDTO = new QrCodeDTO("sucesso", "sucesso", string.Empty);
             _mercadoPagoUseCaseMock.Setup(m => m.PegaStatusPedido(It.IsAny<long>())).ReturnsAsync(mercadoPagoOrderStatus);
+            _mercadoPagoUseCaseMock.Setup(x => x.BuscaPedidoQr(It.IsAny<string>())).ReturnsAsync(qrCodeDTO);
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
@@ -75,8 +78,10 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
         {
             // Arrange
             var command = new StatusPagamentoCommand(123, "payment");
+            var qrCodeDTO = new QrCodeDTO("sucesso", "sucesso", string.Empty);
             var mercadoPagoOrderStatus = new MercadoPagoOrderStatus { Status = "expired", External_reference = Guid.NewGuid().ToString() };
             _mercadoPagoUseCaseMock.Setup(m => m.PegaStatusPedido(It.IsAny<long>())).ReturnsAsync(mercadoPagoOrderStatus);
+            _mercadoPagoUseCaseMock.Setup(x => x.BuscaPedidoQr(It.IsAny<string>())).ReturnsAsync(qrCodeDTO);
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);

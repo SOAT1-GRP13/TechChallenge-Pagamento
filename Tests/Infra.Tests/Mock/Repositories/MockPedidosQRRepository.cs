@@ -10,10 +10,10 @@ namespace Infra.Tests.Mock.Repositories
         {
             var mockRepo = new Mock<IPedidosQRRepository>();
 
-            mockRepo.Setup(r => r.SalvaPedidoQR(new QrCodeDTO("sucesso", "sucesso")));
-            mockRepo.Setup(r => r.SalvaPedidoQR(new QrCodeDTO("erro", "erro"))).ThrowsAsync(new Exception("Simulando uma exceção"));
+            mockRepo.Setup(r => r.SalvaPedidoQR(new QrCodeDTO("sucesso", "sucesso", string.Empty)));
+            mockRepo.Setup(r => r.SalvaPedidoQR(new QrCodeDTO("erro", "erro", string.Empty))).ThrowsAsync(new Exception("Simulando uma exceção"));
             mockRepo.Setup(r => r.BuscaPedidoQr("erro")).ReturnsAsync(new QrCodeDTO());
-            mockRepo.Setup(r => r.BuscaPedidoQr("sucesso")).ReturnsAsync(new QrCodeDTO("sucesso", "sucesso"));
+            mockRepo.Setup(r => r.BuscaPedidoQr("sucesso")).ReturnsAsync(new QrCodeDTO("sucesso", "sucesso", string.Empty));
 
             return mockRepo;
         }

@@ -28,7 +28,7 @@ namespace Application.Pagamentos.MercadoPago.Handlers
                 var dto = new MercadoPagoOrder(request.Input);
                 var response = await _mercadoPagoUseCase.GerarQRCode(dto);
 
-                var pedidoQr = new QrCodeDTO(response, request.Input.PedidoId.ToString());
+                var pedidoQr = new QrCodeDTO(response, request.Input.PedidoId.ToString(), request.Input.ClienteEmail);
                 await _mercadoPagoUseCase.SalvaPedidoQR(pedidoQr);
             }
             else

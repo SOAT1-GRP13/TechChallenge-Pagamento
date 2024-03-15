@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Application.Pagamentos.MercadoPago.Commands;
+using Application.Pagamentos.MercadoPago.UseCases;
 using Domain.Base.Communication.Mediator;
 using Domain.Base.Messages.CommonMessages.Notifications;
 using Domain.Configuration;
@@ -16,15 +17,17 @@ namespace Application.Pagamentos.MercadoPago.Handlers
 
         private readonly IRabbitMQService _rabbitMQService;
         private readonly IMediatorHandler _mediatorHandler;
+        private readonly IMercadoPagoUseCase _mercadoPagoUseCase;
         private readonly Secrets _settings;
 
 
         public StatusPagamentoFakeCommandHandler(
-         IMediatorHandler mediatorHandler, IRabbitMQService rabbitMQService, IOptions<Secrets> options)
+         IMediatorHandler mediatorHandler, IRabbitMQService rabbitMQService, IOptions<Secrets> options, IMercadoPagoUseCase mercadoPagoUseCase)
         {
             _mediatorHandler = mediatorHandler;
             _rabbitMQService = rabbitMQService;
             _settings = options.Value;
+            _mercadoPagoUseCase = mercadoPagoUseCase;
         }
 
         public async Task<bool> Handle(StatusPagamentoFakeCommand request, CancellationToken cancellationToken)
@@ -33,8 +36,9 @@ namespace Application.Pagamentos.MercadoPago.Handlers
             {
                 var pedidoId = request.Id.ToString();
 
+                var pedidoQR = await _mercadoPagoUseCase.BuscaPedidoQr(pedidoId);
 
-                var pedido = new PedidoStatus(pedidoId);
+                var pedido = new PedidoStatus(pedidoId, pedidoQR.ClienteEmail);
 
                 string mensagem = JsonSerializer.Serialize(pedido);
 

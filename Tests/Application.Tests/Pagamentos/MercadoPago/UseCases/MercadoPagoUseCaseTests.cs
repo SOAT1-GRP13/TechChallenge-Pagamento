@@ -25,7 +25,7 @@ namespace Application.Tests.Pagamentos.MercadoPago.UseCases
             // Arrange
             var pedidoItem = new PedidoItem(Guid.NewGuid(), "teste", 1, 10, 10);
             var pedido = new Pedido(Guid.NewGuid(), Guid.NewGuid(), 0, 10,
-             new List<PedidoItem>() { pedidoItem });
+             new List<PedidoItem>() { pedidoItem }, string.Empty);
             var mercadoPagoOrder = new MercadoPagoOrder(pedido);
 
             _useCaseMock.Setup(u => u.GerarQRCode(It.IsAny<MercadoPagoOrder>())).ReturnsAsync("sucesso");
@@ -63,7 +63,7 @@ namespace Application.Tests.Pagamentos.MercadoPago.UseCases
         public async void DeveRetornarPedidoQR_AoChamarBuscaPedidoQr()
         {
             // Arrange
-            var qrCodeDTO = new QrCodeDTO("sucesso", "sucesso");
+            var qrCodeDTO = new QrCodeDTO("sucesso", "sucesso", string.Empty);
 
             _useCaseMock.Setup(u => u.BuscaPedidoQr(It.IsAny<string>())).ReturnsAsync(qrCodeDTO);
 

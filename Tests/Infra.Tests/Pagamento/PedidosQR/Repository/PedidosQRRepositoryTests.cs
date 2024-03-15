@@ -19,7 +19,7 @@ namespace Infra.Tests.Pagamento.PedidosQR.Repository
         public async Task DeveSalvarPedido_DynamoDB()
         {
             //Arrange
-            var qrCodeDto = new QrCodeDTO("sucesso", "sucesso");
+            var qrCodeDto = new QrCodeDTO("sucesso", "sucesso", string.Empty);
 
             // Act
             await _repository.SalvaPedidoQR(qrCodeDto);

@@ -26,7 +26,7 @@ namespace Application.Tests.Pagamentos.MercadoPago.Handlers
         {
             // Arrange
             var pedidoId = Guid.NewGuid();
-            var output = new QrCodeDTO("sucesso", pedidoId.ToString());
+            var output = new QrCodeDTO("sucesso", pedidoId.ToString(), string.Empty);
             var command = new BuscarQRCommand(pedidoId);
 
             _mercadoPagoUseCaseMock.Setup(x => x.BuscaPedidoQr(pedidoId.ToString())).ReturnsAsync(output);

@@ -34,7 +34,8 @@ namespace Application.Pagamentos.MercadoPago.Handlers
             if (request.EhValido())
             {
                 var pedidoStatus = await _mercadoPagoUseCase.PegaStatusPedido(request.Id);
-                var pedido = new PedidoStatus(pedidoStatus.External_reference);
+                var pedidoQR = await _mercadoPagoUseCase.BuscaPedidoQr(pedidoStatus.External_reference);
+                var pedido = new PedidoStatus(pedidoStatus.External_reference, pedidoQR.ClienteEmail);
                 string mensagem = JsonSerializer.Serialize(pedido);
 
                 if (pedidoStatus.Status == "closed")
